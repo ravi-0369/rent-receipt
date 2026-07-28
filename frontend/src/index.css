@@ -1,0 +1,279 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================== BASE ===================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.6); }
+
+/* ===================== GLASSMORPHISM ===================== */
+@layer components {
+  .glass {
+    @apply backdrop-blur-md border border-white/20;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-card {
+    @apply glass rounded-2xl;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .glass-dark {
+    @apply backdrop-blur-md border border-white/10;
+    background: rgba(15, 15, 30, 0.6);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ===================== BUTTONS ===================== */
+  .btn {
+    @apply px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 active:scale-95;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+  }
+
+  .btn-secondary {
+    @apply btn bg-white/10 text-current border border-white/20 hover:bg-white/20 active:scale-95;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-500/80 text-white hover:bg-red-600 active:scale-95;
+  }
+
+  .btn-success {
+    @apply btn bg-accent-500/80 text-white hover:bg-accent-600 active:scale-95;
+  }
+
+  /* ===================== INPUTS ===================== */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border transition-all duration-200 bg-white/5 text-current placeholder-current placeholder-opacity-50 outline-none;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .input-field:focus {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .input-label {
+    @apply block text-sm font-medium mb-1.5 opacity-80;
+  }
+
+  /* ===================== BADGES ===================== */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success { @apply badge bg-green-500/20 text-green-400; }
+  .badge-warning { @apply badge bg-yellow-500/20 text-yellow-400; }
+  .badge-danger  { @apply badge bg-red-500/20 text-red-400; }
+  .badge-info    { @apply badge bg-blue-500/20 text-blue-400; }
+  .badge-purple  { @apply badge bg-purple-500/20 text-purple-400; }
+
+  /* ===================== SIDEBAR ===================== */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer;
+  }
+
+  .sidebar-link:hover {
+    @apply bg-white/10;
+  }
+
+  .sidebar-link.active {
+    @apply bg-primary-600/30 text-primary-300;
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.2);
+  }
+
+  /* ===================== ANIMATIONS ===================== */
+  .animate-enter {
+    animation: slideUp 0.3s ease-out forwards;
+  }
+
+  /* ===================== TABLE ===================== */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+
+  .data-table th {
+    @apply text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider opacity-60;
+  }
+
+  .data-table td {
+    @apply px-4 py-3 text-sm border-t border-white/5;
+  }
+
+  .data-table tr:hover td {
+    @apply bg-white/5;
+  }
+
+  /* ===================== PAGE LAYOUT ===================== */
+  .page-container {
+    @apply flex-1 overflow-y-auto p-6;
+  }
+
+  .page-header {
+    @apply mb-8;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold;
+  }
+
+  .page-subtitle {
+    @apply text-sm opacity-60 mt-1;
+  }
+
+  /* ===================== STAT CARD ===================== */
+  .stat-card {
+    @apply glass-card p-6 flex items-start justify-between;
+  }
+
+  /* ===================== DRAG DROP ===================== */
+  .drop-zone {
+    @apply rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-200 cursor-pointer;
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+
+  .drop-zone:hover,
+  .drop-zone.active {
+    border-color: rgba(99, 102, 241, 0.7);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  /* ===================== PROGRESS BAR ===================== */
+  .progress-track {
+    @apply h-2 rounded-full overflow-hidden;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-300;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+  }
+}
+
+/* ===================== LIGHT MODE ===================== */
+:root {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border: rgba(0,0,0,0.08);
+}
+
+body:not(.dark) {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: var(--text-primary);
+}
+
+body:not(.dark) .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+}
+
+body:not(.dark) .glass-dark {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0,0,0,0.08);
+}
+
+body:not(.dark) .input-field {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--text-primary);
+}
+
+body:not(.dark) .input-field::placeholder {
+  color: rgba(0,0,0,0.35);
+}
+
+body:not(.dark) .btn-secondary {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--text-primary);
+}
+
+body:not(.dark) .btn-secondary:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+/* ===================== DARK MODE ===================== */
+.dark body,
+body.dark {
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+  color: #e2e8f0;
+}
+
+/* ===================== AUTH PAGES ===================== */
+.auth-bg {
+  background: radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 50% 80%, rgba(34, 197, 94, 0.05) 0%, transparent 60%);
+}
+
+/* ===================== LOADING SKELETON ===================== */
+.skeleton {
+  @apply rounded-xl animate-pulse;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* ===================== CHART TOOLTIP ===================== */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: rgba(15, 15, 30, 0.9) !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+  border-radius: 12px !important;
+}
+
+/* ===================== FILE PREVIEW ===================== */
+.file-preview-img {
+  max-height: 600px;
+  object-fit: contain;
+}
+
+/* Pagination */
+.pagination-btn {
+  @apply flex items-center justify-center w-9 h-9 rounded-lg text-sm font-medium transition-all duration-200;
+}
+
+.pagination-btn.active {
+  @apply bg-primary-600 text-white;
+}
+
+.pagination-btn:not(.active):not(:disabled):hover {
+  @apply bg-white/10;
+}
