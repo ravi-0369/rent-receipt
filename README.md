@@ -104,12 +104,7 @@ npm install
 cd backend
 npm run seed
 ```
-This creates sample users and receipts. Login credentials:
-| Role  | Email | Password |
-|-------|-------|---------|
-| Admin | admin@rentreceipts.com | admin123 |
-| User  | rahul@example.com | user123 |
-| User  | priya@example.com | user123 |
+This creates sample users and receipts for local development only. Do not run the seed script in production.
 
 ### 6. Start Development Servers
 
@@ -227,7 +222,7 @@ npm run build
 
 | Page | Route | Description |
 |------|-------|-------------|
-| Login | `/login` | JWT auth with demo credentials |
+| Login | `/login` | JWT authentication |
 | Signup | `/signup` | Password strength indicator |
 | Dashboard | `/dashboard` | Analytics, charts, recent receipts |
 | Upload | `/upload` | Drag-drop upload with progress |
