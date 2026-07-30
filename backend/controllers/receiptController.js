@@ -43,15 +43,15 @@ const sendUploadConfirmationEmail = async (user, receipt) => {
 exports.uploadReceipt = async (req, res) => {
   try {
     const {
-      tenantName, landlordName, flatNumber, month, year,
+      tenantName, month, year,
       amount, paymentMethod, paymentDate, notes
     } = req.body;
 
     const receiptData = {
       userId: req.user._id,
       tenantName,
-      landlordName,
-      flatNumber,
+      landlordName: '',
+      flatNumber: '',
       month,
       year: parseInt(year),
       amount: parseFloat(amount),
@@ -117,9 +117,7 @@ exports.getReceipts = async (req, res) => {
     }
     if (search) {
       query.$or = [
-        { tenantName: { $regex: search, $options: 'i' } },
-        { landlordName: { $regex: search, $options: 'i' } },
-        { flatNumber: { $regex: search, $options: 'i' } }
+        { tenantName: { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -151,7 +149,8 @@ exports.getReceipts = async (req, res) => {
 // @access  Private
 exports.getReceipt = async (req, res) => {
   try {
-    const receipt = await Receipt.findOne({ _id: req.params.id, userId: req.user._id });
+    const receipt = await Receipt.findOne({ _id: req.params.id, userId: req.user._id })
+      .populate('reviewedBy', 'name');
     if (!receipt) {
       return res.status(404).json({ success: false, message: 'Receipt not found' });
     }
@@ -171,7 +170,7 @@ exports.updateReceipt = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Receipt not found' });
     }
 
-    const allowedUpdates = ['tenantName', 'landlordName', 'flatNumber', 'month', 'year',
+    const allowedUpdates = ['tenantName', 'month', 'year',
       'amount', 'paymentMethod', 'paymentDate', 'notes'];
     const updates = {};
     allowedUpdates.forEach(field => {

@@ -1,44 +1,67 @@
-import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, Upload, History, FileText,
-  Users, ShieldCheck, LogOut, Menu, X, Home,
-  TrendingUp, ChevronRight
+  Users, ShieldCheck, LogOut, X, Home,
+  ClipboardList
 } from 'lucide-react';
+import API from '../../api/axios';
 
-const NavItem = ({ to, icon: Icon, label, onClick }) => (
+/* ── Nav item with optional badge ── */
+const NavItem = ({ to, icon: Icon, label, badge, onClick }) => (
   <NavLink
     to={to}
+    end={to === '/admin'}
     onClick={onClick}
     className={({ isActive }) =>
       `sidebar-link ${isActive ? 'active' : 'opacity-70 hover:opacity-100'}`
     }
   >
     <Icon size={18} className="shrink-0" />
-    <span>{label}</span>
+    <span className="flex-1">{label}</span>
+    {badge > 0 && (
+      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-yellow-500 text-black text-[10px] font-bold animate-pulse">
+        {badge > 99 ? '99+' : badge}
+      </span>
+    )}
   </NavLink>
 );
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout, isAdmin } = useAuth();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  // Fetch pending count for admins
+  useEffect(() => {
+    if (!isAdmin) return;
+    const fetchPending = async () => {
+      try {
+        const { data } = await API.get('/admin/verify', { params: { status: 'Pending', limit: 1 } });
+        setPendingCount(data.counts?.Pending ?? 0);
+      } catch {
+        // silently ignore
+      }
+    };
+    fetchPending();
+    const interval = setInterval(fetchPending, 60_000); // refresh every minute
+    return () => clearInterval(interval);
+  }, [isAdmin]);
 
   const userLinks = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/upload', icon: Upload, label: 'Upload Receipt' },
-    { to: '/history', icon: History, label: 'Receipt History' },
+    { to: '/upload',    icon: Upload,          label: 'Upload Receipt' },
+    { to: '/history',   icon: History,         label: 'Receipt History' },
   ];
 
   const adminLinks = [
-    { to: '/admin', icon: ShieldCheck, label: 'Admin Dashboard' },
-    { to: '/admin/users', icon: Users, label: 'Manage Users' },
-    { to: '/admin/receipts', icon: FileText, label: 'All Receipts' },
+    { to: '/admin',          icon: ShieldCheck,   label: 'Admin Dashboard' },
+    { to: '/admin/verify',   icon: ClipboardList, label: 'Verification',    badge: pendingCount },
+    { to: '/admin/users',    icon: Users,         label: 'Manage Users' },
+    { to: '/admin/receipts', icon: FileText,      label: 'All Receipts' },
   ];
 
-  const handleLogout = () => {
-    logout();
-    onClose?.();
-  };
+  const handleLogout = () => { logout(); onClose?.(); };
 
   const initials = user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
 

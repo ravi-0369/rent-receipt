@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Download, Edit, Trash2, FileText, Image, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, Download, Edit, Trash2, FileText, Image, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 
 const statusBadge = (status) => {
@@ -96,7 +96,20 @@ const ReceiptTable = ({ receipts, onDelete, onEdit, currentPage, totalPages, onP
                 <td>{methodBadge(r.paymentMethod)}</td>
                 <td className="opacity-70 text-xs">{r.paymentDate ? format(new Date(r.paymentDate), 'dd MMM yyyy') : '-'}</td>
                 <td className="opacity-70 text-xs">{r.createdAt ? format(new Date(r.createdAt), 'dd MMM yyyy') : '-'}</td>
-                <td>{statusBadge(r.status)}</td>
+                <td>
+                  <div className="flex items-center gap-1.5">
+                    {statusBadge(r.status)}
+                    {r.adminReply && (
+                      <Link
+                        to={`/receipt/${r._id}`}
+                        title={`Admin reply: ${r.adminReply}`}
+                        className="text-primary-400 hover:text-primary-300 transition-colors"
+                      >
+                        <MessageSquare size={13} />
+                      </Link>
+                    )}
+                  </div>
+                </td>
                 <td>
                   <div className="flex items-center gap-1">
                     <Link

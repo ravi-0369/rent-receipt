@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Download, FileText, Calendar, IndianRupee, User, Home, CreditCard, FileCheck } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Calendar, IndianRupee, User, Home, CreditCard, FileCheck, CheckCircle, XCircle, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import API from '../api/axios';
@@ -135,8 +135,7 @@ const ReceiptDetail = () => {
           </div>
 
           <InfoRow icon={User} label="Tenant Name" value={receipt.tenantName} />
-          <InfoRow icon={Home} label="Flat / House No." value={receipt.flatNumber} />
-          <InfoRow icon={User} label="Landlord Name" value={receipt.landlordName} />
+
           <InfoRow icon={Calendar} label="Rent Period" value={`${receipt.month} ${receipt.year}`} />
           <InfoRow icon={IndianRupee} label="Rent Amount" value={`₹${receipt.amount?.toLocaleString('en-IN')}`} />
           <InfoRow icon={CreditCard} label="Payment Method" value={receipt.paymentMethod} />
@@ -146,6 +145,50 @@ const ReceiptDetail = () => {
           )}
         </div>
       </div>
+
+      {/* Admin Decision Card */}
+      {receipt.adminReply && receipt.status !== 'Pending' && (
+        <div className={`glass-card p-5 border ${
+          receipt.status === 'Verified'
+            ? 'border-green-500/30 bg-green-500/5'
+            : 'border-red-500/30 bg-red-500/5'
+        } animate-enter`}>
+          <div className="flex items-start gap-4">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              receipt.status === 'Verified' ? 'bg-green-500/20' : 'bg-red-500/20'
+            }`}>
+              {receipt.status === 'Verified'
+                ? <CheckCircle size={22} className="text-green-400" />
+                : <XCircle size={22} className="text-red-400" />
+              }
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <p className={`font-bold text-base ${
+                  receipt.status === 'Verified' ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {receipt.status === 'Verified' ? 'Document Accepted ✅' : 'Document Rejected ❌'}
+                </p>
+                <span className={`badge ${
+                  receipt.status === 'Verified' ? 'badge-success' : 'badge-danger'
+                }`}>
+                  {receipt.status}
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <MessageSquare size={14} className="opacity-40 mt-0.5 flex-shrink-0" />
+                <p className="text-sm opacity-80 leading-relaxed">{receipt.adminReply}</p>
+              </div>
+              {receipt.reviewedAt && (
+                <p className="text-xs opacity-30 mt-3">
+                  Reviewed on {format(new Date(receipt.reviewedAt), 'dd MMMM yyyy, hh:mm a')}
+                  {receipt.reviewedBy?.name && ` by ${receipt.reviewedBy.name}`}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

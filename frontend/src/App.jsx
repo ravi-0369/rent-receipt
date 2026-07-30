@@ -13,6 +13,7 @@ import ReceiptDetail from './pages/ReceiptDetail';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminReceipts from './pages/admin/AdminReceipts';
+import AdminVerification from './pages/admin/AdminVerification';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -60,6 +61,7 @@ const AppRoutes = () => (
       <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
       <Route path="/admin/receipts" element={<ProtectedRoute adminOnly><AdminReceipts /></ProtectedRoute>} />
+      <Route path="/admin/verify" element={<ProtectedRoute adminOnly><AdminVerification /></ProtectedRoute>} />
     </Route>
 
     {/* Default redirect */}

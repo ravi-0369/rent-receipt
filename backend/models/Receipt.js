@@ -13,19 +13,17 @@ const ReceiptSchema = new mongoose.Schema({
   },
   landlordName: {
     type: String,
-    required: [true, 'Landlord name is required'],
-    trim: true
+    trim: true,
+    default: ''
   },
   flatNumber: {
     type: String,
-    required: [true, 'Flat/House number is required'],
-    trim: true
+    trim: true,
+    default: ''
   },
   month: {
     type: String,
-    required: [true, 'Month is required'],
-    enum: ['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December']
+    required: [true, 'Month is required']
   },
   year: {
     type: Number,
@@ -63,7 +61,23 @@ const ReceiptSchema = new mongoose.Schema({
     type: String,
     enum: ['Pending', 'Verified', 'Rejected'],
     default: 'Pending'
+  },
+  adminReply: {
+    type: String,
+    trim: true,
+    maxlength: [1000, 'Admin reply cannot exceed 1000 characters'],
+    default: null
+  },
+  reviewedAt: {
+    type: Date,
+    default: null
+  },
+  reviewedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
   }
+
 }, {
   timestamps: true
 });

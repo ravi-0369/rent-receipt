@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, FileText, IndianRupee, TrendingUp, ArrowRight } from 'lucide-react';
+import { Users, FileText, IndianRupee, TrendingUp, ArrowRight, LogIn, UserX, ClipboardList, ShieldAlert } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import API from '../../api/axios';
@@ -51,11 +51,32 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard icon={Users} label="Total Users" value={stats?.totalUsers || 0} color="blue" />
         <StatCard icon={FileText} label="Total Receipts" value={stats?.totalReceipts || 0} color="purple" delay={60} />
         <StatCard icon={IndianRupee} label="Total Amount" value={`₹${(stats?.totalAmount || 0).toLocaleString('en-IN')}`} color="green" delay={120} />
+        <StatCard icon={LogIn} label="Logged In Today" value={stats?.loggedInToday ?? 0} color="green" delay={180} />
+        <StatCard icon={UserX} label="Never Logged In" value={stats?.neverLoggedIn ?? 0} color="red" delay={240} />
       </div>
+
+      {/* Verification quick-action banner */}
+      {(stats?.pendingVerification ?? 0) > 0 && (
+        <Link
+          to="/admin/verify"
+          className="flex items-center justify-between p-4 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/15 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+              <ShieldAlert size={20} className="text-yellow-400" />
+            </div>
+            <div>
+              <p className="font-semibold text-yellow-400">{stats.pendingVerification} document{stats.pendingVerification !== 1 ? 's' : ''} awaiting verification</p>
+              <p className="text-xs opacity-60">Click to open the verification queue</p>
+            </div>
+          </div>
+          <ArrowRight size={18} className="text-yellow-400 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      )}
 
       {/* Chart */}
       {chartData.length > 0 && (

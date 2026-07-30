@@ -1,31 +1,91 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, X, CheckCircle, Image } from 'lucide-react';
+import { Upload, FileText, X, CheckCircle, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import API from '../api/axios';
 
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 10 }, (_, i) => CURRENT_YEAR - i);
 const METHODS = ['Cash', 'UPI', 'Bank Transfer', 'Card'];
 
+/* ─── Month pill multi-selector ─────────────────────── */
+const MonthSelector = ({ selected, onChange }) => {
+  const toggle = (month) => {
+    if (selected.includes(month)) {
+      onChange(selected.filter(m => m !== month));
+    } else {
+      onChange([...selected, month]);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {MONTHS.map(m => {
+          const isActive = selected.includes(m);
+          return (
+            <button
+              key={m}
+              type="button"
+              id={`month-pill-${m.toLowerCase()}`}
+              onClick={() => toggle(m)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-150 select-none
+                ${isActive
+                  ? 'bg-primary-600 border-primary-500 text-white shadow-md shadow-primary-600/30 scale-105'
+                  : 'bg-white/5 border-white/15 hover:border-primary-500/50 hover:bg-primary-600/10 opacity-70 hover:opacity-100'
+                }`}
+            >
+              {isActive && <Check size={12} strokeWidth={3} />}
+              {m.slice(0, 3)}
+            </button>
+          );
+        })}
+      </div>
+      {selected.length > 0 && (
+        <div className="flex items-center justify-between pt-1">
+          <p className="text-xs text-primary-400 font-medium">
+            {selected.length === 1
+              ? selected[0]
+              : `${selected.length} months selected: ${selected.join(', ')}`}
+          </p>
+          <button
+            type="button"
+            onClick={() => onChange([])}
+            className="text-xs opacity-40 hover:opacity-80 transition-opacity"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+      {selected.length === 0 && (
+        <p className="text-xs opacity-40">Click to select one or more months</p>
+      )}
+    </div>
+  );
+};
+
+/* ─── Main component ─────────────────────────────────── */
 const UploadReceipt = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    tenantName: '', landlordName: '', flatNumber: '',
-    month: MONTHS[new Date().getMonth()],
+    tenantName: '',
+    selectedMonths: [MONTHS[new Date().getMonth()]], // pre-select current month
     year: CURRENT_YEAR,
-    amount: '', paymentMethod: 'UPI',
+    amount: '',
+    paymentMethod: 'UPI',
     paymentDate: new Date().toISOString().split('T')[0],
     notes: ''
   });
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [file, setFile]         = useState(null);
+  const [preview, setPreview]   = useState(null);
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess]   = useState(false);
 
   const handleChange = e => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -36,11 +96,7 @@ const UploadReceipt = () => {
     }
     const f = accepted[0];
     setFile(f);
-    if (f.type.startsWith('image/')) {
-      setPreview(URL.createObjectURL(f));
-    } else {
-      setPreview(null);
-    }
+    setPreview(f.type.startsWith('image/') ? URL.createObjectURL(f) : null);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -54,15 +110,19 @@ const UploadReceipt = () => {
     multiple: false
   });
 
-  const removeFile = () => {
-    setFile(null);
-    setPreview(null);
-    setProgress(0);
-  };
+  const removeFile = () => { setFile(null); setPreview(null); setProgress(0); };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.tenantName || !form.landlordName || !form.flatNumber || !form.amount || !form.paymentDate) {
+    if (!form.tenantName.trim()) {
+      toast.error('Please enter the tenant name');
+      return;
+    }
+    if (form.selectedMonths.length === 0) {
+      toast.error('Please select at least one month');
+      return;
+    }
+    if (!form.amount || !form.paymentDate) {
       toast.error('Please fill all required fields');
       return;
     }
@@ -70,16 +130,24 @@ const UploadReceipt = () => {
     setUploading(true);
     setProgress(0);
 
+    // Join months in calendar order
+    const orderedMonths = MONTHS.filter(m => form.selectedMonths.includes(m));
+    const monthValue = orderedMonths.join(', ');
+
     const formData = new FormData();
-    Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+    formData.append('tenantName', form.tenantName);
+    formData.append('month', monthValue);
+    formData.append('year', form.year);
+    formData.append('amount', form.amount);
+    formData.append('paymentMethod', form.paymentMethod);
+    formData.append('paymentDate', form.paymentDate);
+    formData.append('notes', form.notes);
     if (file) formData.append('receiptFile', file);
 
     try {
       await API.post('/receipts', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (e) => {
-          setProgress(Math.round((e.loaded * 100) / e.total));
-        }
+        onUploadProgress: (e) => setProgress(Math.round((e.loaded * 100) / e.total))
       });
       setSuccess(true);
       toast.success('Receipt uploaded successfully! 🎉');
@@ -92,6 +160,7 @@ const UploadReceipt = () => {
     }
   };
 
+  /* ── Success screen ── */
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center py-20 animate-enter">
@@ -112,59 +181,93 @@ const UploadReceipt = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+
         {/* Section: Tenant Info */}
         <div className="glass-card p-6 space-y-4">
           <h3 className="font-semibold text-base border-b border-white/10 pb-3">Tenant Information</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="input-label">Tenant Name *</label>
-              <input id="tenant-name" type="text" name="tenantName" value={form.tenantName}
-                onChange={handleChange} className="input-field" placeholder="Your full name" required />
-            </div>
-            <div>
-              <label className="input-label">House / Flat Number *</label>
-              <input id="flat-number" type="text" name="flatNumber" value={form.flatNumber}
-                onChange={handleChange} className="input-field" placeholder="e.g. A-101" required />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="input-label">Landlord Name *</label>
-              <input id="landlord-name" type="text" name="landlordName" value={form.landlordName}
-                onChange={handleChange} className="input-field" placeholder="Your landlord's name" required />
-            </div>
+          <div>
+            <label className="input-label">Tenant Name *</label>
+            <input
+              id="tenant-name"
+              type="text"
+              name="tenantName"
+              value={form.tenantName}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Your full name"
+              required
+            />
           </div>
         </div>
 
         {/* Section: Payment Details */}
-        <div className="glass-card p-6 space-y-4">
+        <div className="glass-card p-6 space-y-5">
           <h3 className="font-semibold text-base border-b border-white/10 pb-3">Payment Details</h3>
+
+          {/* Multi-month selector */}
+          <div>
+            <label className="input-label">
+              Month(s) *
+              <span className="ml-2 text-xs font-normal opacity-50 normal-case">Select one or more months</span>
+            </label>
+            <MonthSelector
+              selected={form.selectedMonths}
+              onChange={months => setForm(prev => ({ ...prev, selectedMonths: months }))}
+            />
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="input-label">Month *</label>
-              <select id="month" name="month" value={form.month} onChange={handleChange} className="input-field">
-                {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
+            {/* Year */}
             <div>
               <label className="input-label">Year *</label>
               <select id="year" name="year" value={form.year} onChange={handleChange} className="input-field">
                 {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
+
+            {/* Amount */}
             <div>
-              <label className="input-label">Rent Amount (₹) *</label>
-              <input id="amount" type="number" name="amount" value={form.amount}
-                onChange={handleChange} className="input-field" placeholder="e.g. 12000" min="0" required />
+              <label className="input-label">
+                Rent Amount (₹) *
+                {form.selectedMonths.length > 1 && (
+                  <span className="ml-2 text-xs font-normal text-primary-400">
+                    Total for {form.selectedMonths.length} months
+                  </span>
+                )}
+              </label>
+              <input
+                id="amount"
+                type="number"
+                name="amount"
+                value={form.amount}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="e.g. 12000"
+                min="0"
+                required
+              />
             </div>
+
+            {/* Payment method */}
             <div>
               <label className="input-label">Payment Method *</label>
               <select id="payment-method" name="paymentMethod" value={form.paymentMethod} onChange={handleChange} className="input-field">
                 {METHODS.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
-            <div className="sm:col-span-2">
+
+            {/* Payment date */}
+            <div>
               <label className="input-label">Payment Date *</label>
-              <input id="payment-date" type="date" name="paymentDate" value={form.paymentDate}
-                onChange={handleChange} className="input-field" required />
+              <input
+                id="payment-date"
+                type="date"
+                name="paymentDate"
+                value={form.paymentDate}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
             </div>
           </div>
         </div>

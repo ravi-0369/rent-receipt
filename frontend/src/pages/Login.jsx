@@ -120,12 +120,7 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Demo credentials hint */}
-              <div className="rounded-xl p-3 bg-primary-500/10 border border-primary-500/20 text-xs opacity-80">
-                <p className="font-semibold mb-1">Demo Credentials (after seeding):</p>
-                <p>User: rahul@example.com / user123</p>
-                <p>Admin: admin@rentreceipts.com / admin123</p>
-              </div>
+
 
               {/* Submit */}
               <button
