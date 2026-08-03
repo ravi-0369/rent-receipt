@@ -11,7 +11,6 @@ const YEARS = Array.from({ length: 10 }, (_, i) => CURRENT_YEAR - i);
 
 const EditReceiptModal = ({ receipt, onClose, onSuccess }) => {
   const [form, setForm] = useState({
-    tenantName: receipt.tenantName || '',
     month: receipt.month || '',
     year: receipt.year || CURRENT_YEAR,
     amount: receipt.amount || '',
@@ -49,10 +48,7 @@ const EditReceiptModal = ({ receipt, onClose, onSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
           <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="input-label">Tenant Name</label>
-              <input type="text" name="tenantName" value={form.tenantName} onChange={handleChange} className="input-field" required />
-            </div>
+
             <div>
               <label className="input-label">Month</label>
               <select name="month" value={form.month} onChange={handleChange} className="input-field">

@@ -289,7 +289,7 @@ const AdminVerification = () => {
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search tenant, landlord, flat number..."
+            placeholder="Search by tenant name or email..."
             className="input-field pl-9"
           />
         </div>
@@ -408,8 +408,8 @@ const AdminVerification = () => {
                         </td>
                         {/* Document info */}
                         <td>
-                          <p className="font-semibold text-sm">{r.tenantName}</p>
-                          <p className="text-xs opacity-50">{r.flatNumber} · {r.landlordName}</p>
+                          <p className="font-semibold text-sm">{r.tenantName || r.userId?.name || '—'}</p>
+                          <p className="text-xs opacity-50">Receipt #{r._id?.slice(-6).toUpperCase()}</p>
                         </td>
                         {/* User */}
                         <td>

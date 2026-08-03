@@ -18,11 +18,11 @@ const STATUS_STYLES = {
 };
 
 const exportCSV = (receipts) => {
-  const headers = ['Tenant', 'Landlord', 'Flat', 'Month', 'Year', 'Amount (₹)', 'Method', 'Status', 'User', 'Upload Date'];
+  const headers = ['User', 'Month', 'Year', 'Amount (₹)', 'Method', 'Status', 'Upload Date'];
   const rows = receipts.map(r => [
-    r.tenantName, r.landlordName, r.flatNumber, r.month, r.year,
+    r.userId?.name || '', r.month, r.year,
     r.amount, r.paymentMethod, r.status,
-    r.userId?.name || '', format(new Date(r.createdAt), 'dd MMM yyyy')
+    format(new Date(r.createdAt), 'dd MMM yyyy')
   ]);
   const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -137,7 +137,7 @@ const AdminReceipts = () => {
             value={filters.search}
             onChange={e => setFilters(p => ({ ...p, search: e.target.value }))}
             className="input-field pl-9"
-            placeholder="Search tenant, landlord, flat..."
+            placeholder="Search by user name or email..."
           />
         </div>
         <select value={filters.month} onChange={e => setFilters(p => ({ ...p, month: e.target.value }))} className="input-field w-auto">
@@ -181,8 +181,8 @@ const AdminReceipts = () => {
                   {receipts.map((r, i) => (
                     <tr key={r._id} className="animate-enter" style={{ animationDelay: `${i * 25}ms` }}>
                       <td>
-                        <p className="font-medium text-sm">{r.tenantName}</p>
-                        <p className="text-xs opacity-50">{r.flatNumber}</p>
+                        <p className="font-medium text-sm">{r.userId?.name || '—'}</p>
+                        <p className="text-xs opacity-50">Receipt #{r._id?.slice(-6).toUpperCase()}</p>
                       </td>
                       <td>
                         <p className="text-sm">{r.userId?.name || '—'}</p>

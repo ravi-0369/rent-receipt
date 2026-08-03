@@ -73,7 +73,6 @@ const MonthSelector = ({ selected, onChange }) => {
 const UploadReceipt = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    tenantName: '',
     selectedMonths: [MONTHS[new Date().getMonth()]], // pre-select current month
     year: CURRENT_YEAR,
     amount: '',
@@ -114,10 +113,6 @@ const UploadReceipt = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.tenantName.trim()) {
-      toast.error('Please enter the tenant name');
-      return;
-    }
     if (form.selectedMonths.length === 0) {
       toast.error('Please select at least one month');
       return;
@@ -135,7 +130,6 @@ const UploadReceipt = () => {
     const monthValue = orderedMonths.join(', ');
 
     const formData = new FormData();
-    formData.append('tenantName', form.tenantName);
     formData.append('month', monthValue);
     formData.append('year', form.year);
     formData.append('amount', form.amount);
@@ -182,23 +176,6 @@ const UploadReceipt = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* Section: Tenant Info */}
-        <div className="glass-card p-6 space-y-4">
-          <h3 className="font-semibold text-base border-b border-white/10 pb-3">Tenant Information</h3>
-          <div>
-            <label className="input-label">Tenant Name *</label>
-            <input
-              id="tenant-name"
-              type="text"
-              name="tenantName"
-              value={form.tenantName}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="Your full name"
-              required
-            />
-          </div>
-        </div>
 
         {/* Section: Payment Details */}
         <div className="glass-card p-6 space-y-5">
