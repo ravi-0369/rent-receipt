@@ -5,7 +5,7 @@ A modern, full-stack Rent Receipt Management System built with **React.js** (Vit
 ![Tech Stack](https://img.shields.io/badge/React-18-blue?logo=react) ![Node.js](https://img.shields.io/badge/Node.js-20-green?logo=node.js) ![MongoDB](https://img.shields.io/badge/MongoDB-8-green?logo=mongodb) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-blue?logo=tailwindcss)
 
 ---
-
+myself ravi 
 ## ✨ Features
 
 ### User Features
